@@ -56,7 +56,7 @@ def scrape():
     items = browser.find_by_id("product-section")
     items = browser.find_by_css('div[class="description"]')
     item_count = len(items)
-
+    main_url = "https://astrogeology.usgs.gov"
     hemisphere_image_urls = []
     for x in range(item_count):   
         browser.visit(url_4)
@@ -70,9 +70,12 @@ def scrape():
         new_url = browser.url
         response = requests.get(new_url)
         soup = bs(response.text, 'html.parser')
-        results = soup.find_all('a', text ="Original")
-        link_text = results[0]['href']
-        hemisphere_image_urls.append({"title":"Image", "url": link_text})
+        results = soup.find_all('h2')
+        img_label = results[0].text
+        images = soup.find_all('img')
+        images = soup.find_all('img', attrs={"class":"wide-image"})
+        link_text = main_url + images[0]['src']
+        hemisphere_image_urls.append({"title":img_label, "url": link_text})
 
     browser.quit()
     mars_data = {"top_story": nasa_news[0],"mars_facts": mars_facts_html_table, "mars_images":hemisphere_image_urls}  
